@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Router | Master Architecture v11</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap');
+
+        :root {
+            --bg: #020205;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #00ff41;
+            --primary: #5e5ce6;
+            --fail: #ff3b30;
+            --text: #ffffff;
+            --text-dim: #a1a1aa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 2vh;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, #0a0a1a 0%, #020205 100%);
+        }
+
+        /* 1. Clear Header Hierarchy */
+        header {
+            text-align: center;
+            margin-bottom: 2px;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.8vw;
+            margin: 0;
+            letter-spacing: 4px;
+            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            font-size: 0.7vw;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 3px 0 10px 0;
+        }
+
+        /* 2. Absolute Case Selection Overlay (Below Header) */
+        .case-switcher {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            z-index: 100;
+        }
+
+        .case-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.7vw;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .case-btn:hover {
+            border-color: var(--accent);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .case-btn.active {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+        }
+
+        /* 3. 16:9 Stage Area */
+        .stage {
+            position: relative;
+            width: 92vw;
+            height: calc(92vw * 9 / 16);
+            max-width: calc(68vh * 16 / 9);
+            max-height: 68vh;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+
+        /* Rectilinear Path Layer */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        path {
+            stroke-width: 2.2;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        path.guide {
+            opacity: 0.03;
+            stroke: #fff;
+        }
+
+        path.active {
+            opacity: 1;
+            stroke: var(--accent);
+            stroke-dasharray: 6;
+            animation: dash 0.8s linear infinite;
+        }
+
+        path.fail {
+            opacity: 1;
+            stroke: var(--fail);
+            stroke-dasharray: 4;
+        }
+
+        path.return {
+            opacity: 1;
+            stroke: var(--primary);
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+
+        /* Block Elements */
+        .block {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .block.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .block.highlight {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        .block.error {
+            border-color: var(--fail);
+        }
+
+        .block h3 {
+            margin: 0;
+            font-size: 0.8vw;
+            color: #eee;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sub-items {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6vw;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Dynamic Positions (Relative to 16:9 stage) */
+        #user-node {
+            left: 3%;
+            top: 40%;
+            width: 9vw;
+        }
+
+        #fe-node {
+            left: 16%;
+            top: 35%;
+            width: 14vw;
+        }
+
+        #be-node {
+            left: 34%;
+            top: 35%;
+            width: 16vw;
+        }
+
+        #auth-node {
+            left: 34%;
+            top: 8%;
+            width: 16vw;
+        }
+
+        #logic-node {
+            left: 16%;
+            top: 68%;
+            width: 14vw;
+        }
+
+        #gemini-node {
+            right: 5%;
+            top: 8%;
+            width: 14vw;
+        }
+
+        #chatgpt-node {
+            right: 5%;
+            top: 38%;
+            width: 14vw;
+        }
+
+        #groq-node {
+            right: 5%;
+            top: 68%;
+            width: 14vw;
+        }
+
+        /* 4. Controls (Corner Buttons) */
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 12%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 50;
+        }
+
+        .status-msg {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75vw;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 20px;
+            border-radius: 20px;
+        }
+
+        .nav-btn {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.75vw;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: #1a1a1a;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.1;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.primary {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>HELIOS ROUTER MASTER SYSTEM</h1>
+        <p>PRECISION ARCHITECTURAL VISUALIZATION V11</p>
+    </header>
+
+    <div class="case-switcher">
+        <button class="case-btn" id="c1" onclick="selectCase('m1')">NORMAL FLOW (GEMINI)</button>
+        <button class="case-btn" id="c2" onclick="selectCase('m2')">PARTIAL FAILOVER (CHATGPT)</button>
+        <button class="case-btn" id="c3" onclick="selectCase('m3')">CRITICAL FAILOVER (GROQ)</button>
+    </div>
+
+    <div class="stage">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <!-- Baseline Orthogonal Paths -->
+            <path id="p1" d="M 120 450 L 160 450" /> <!-- User to FE -->
+            <path id="p2" d="M 300 450 L 340 450" /> <!-- FE to BE -->
+
+            <!-- Auth Handshake -->
+            <path id="p3_up" d="M 380 350 L 380 230" />
+            <path id="p3_dn" d="M 440 230 L 440 350" />
+
+            <!-- Router Logic Diversion -->
+            <path id="p4" d="M 340 480 L 320 480 L 320 750 L 300 750" />
+
+            <!-- AI Direct Paths (Always Attempt Priority Node Gemini first) -->
+            <path id="p5" d="M 300 750 L 760 750 L 760 160 L 810 160" /> <!-- Logic to Gemini -->
+            <path id="p6" d="M 880 230 L 880 330 L 950 330 L 950 400" /> <!-- Gemini fail to ChatGPT -->
+            <path id="p7" d="M 880 500 L 880 620 L 950 620 L 950 680" /> <!-- ChatGPT fail to Groq -->
+
+            <!-- Return Paths (Direct to UI) -->
+            <path id="ret_gem" d="M 810 130 L 500 130 L 500 50 L 80 50 L 80 400" class="return" />
+            <path id="ret_gpt" d="M 810 450 L 80 450" class="return" />
+            <path id="ret_groq" d="M 810 750 L 500 750 L 500 950 L 80 950 L 80 500" class="return" />
+        </svg>
+
+        <!-- Layers -->
+        <div id="user-node" class="block">
+            <h3>User Interface</h3>
+            <div class="sub-items">
+                <span class="tag">Terminal Client</span>
+            </div>
+        </div>
+
+        <div id="fe-node" class="block">
+            <h3>Frontend Layer</h3>
+            <div class="sub-items">
+                <span class="tag">React Hub</span>
+                <span class="tag">Telemetry Sync</span>
+            </div>
+        </div>
+
+        <div id="be-node" class="block">
+            <h3>Backend API</h3>
+            <div class="sub-items">
+                <span class="tag">Node Orchestrator</span>
+                <span class="tag">Env Validator</span>
+            </div>
+        </div>
+
+        <div id="auth-node" class="block">
+            <h3>Authentication</h3>
+            <div class="sub-items">
+                <span class="tag">JWT Handshake</span>
+                <span class="tag">Security Audit</span>
+            </div>
+        </div>
+
+        <div id="logic-node" class="block">
+            <h3>Router Logic</h3>
+            <div class="sub-items">
+                <span class="tag">Priority Matrix</span>
+                <span class="tag">Failover Chain</span>
+            </div>
+        </div>
+
+        <!-- AI Nodes -->
+        <div id="gemini-node" class="block">
+            <h3>Gemini AI</h3>
+            <div class="sub-items"><span class="tag">Priority Node</span></div>
+        </div>
+        <div id="chatgpt-node" class="block">
+            <h3>ChatGPT</h3>
+            <div class="sub-items"><span class="tag">Redundancy #1</span></div>
+        </div>
+        <div id="groq-node" class="block">
+            <h3>Groq AI</h3>
+            <div class="sub-items"><span class="tag">Final Fallback</span></div>
+        </div>
+
+        <div class="controls">
+            <button class="nav-btn" id="prev" onclick="moveStep(-1)" disabled>STEP BACK</button>
+            <div class="status-msg" id="status">INITIALIZING SYSTEM ARCHITECTURE...</div>
+            <button class="nav-btn primary" id="next" onclick="moveStep(1)" disabled>NEXT STEP</button>
+        </div>
+    </div>
+
+    <script>
+        let activeMode = '';
+        let currentStepIndex = 0;
+        const sequences = {
+            m1: [
+                { id: 'user-node', msg: 'USER: Broadcasting query to Helios Interface...' },
+                { id: 'p1', msg: 'FRONTEND: Syncing telemetry and schema...' },
+                { id: 'fe-node', msg: 'FRONTEND: Secured request tunnel established.' },
+                { id: 'p2', msg: 'BACKEND: Routing request to Orchestrator...' },
+                { id: 'be-node', msg: 'BACKEND: Initializing environment validation...' },
+                { id: 'p3_up', msg: 'AUTH: Triggering Security Handshake...' },
+                { id: 'auth-node', msg: 'AUTH: JWT and Identity verified.' },
+                { id: 'p3_dn', msg: 'BACKEND: Handshake complete. Access granted.' },
+                { id: 'p4', msg: 'ROUTER: Passing payload to Logic Engine...' },
+                { id: 'logic-node', msg: 'LOGIC: Priority Analysis Target -> Gemini AI.' },
+                { id: 'p5', msg: 'ROUTER: Attempting Priority Node connection...' },
+                { id: 'gemini-node', msg: 'GEMINI: Request successfully processed.' },
+                { id: 'ret_gem', msg: 'SUCCESS: Real-time response delivered to User.' }
+            ],
+            m2: [
+                { id: 'user-node', msg: 'USER: Broadcasting query to Helios Interface...' },
+                { id: 'p1', msg: 'FRONTEND: Syncing telemetry and schema...' },
+                { id: 'fe-node', msg: 'FRONTEND: Secured request tunnel established.' },
+                { id: 'p2', msg: 'BACKEND: Routing request to Orchestrator...' },
+                { id: 'be-node', msg: 'BACKEND: Initializing environment validation...' },
+                { id: 'p3_up', msg: 'AUTH: Triggering Security Handshake...' },
+                { id: 'auth-node', msg: 'AUTH: JWT verified.' },
+                { id: 'p3_dn', msg: 'BACKEND: Handshake complete.' },
+                { id: 'p4', msg: 'ROUTER: Passing payload to Logic Engine...' },
+                { id: 'logic-node', msg: 'LOGIC: Priority found: GEMINI AI.' },
+                { id: 'p5', msg: 'GEMINI: Attempting connection...', fail: true },
+                { id: 'gemini-node', msg: 'GEMINI: DISCONNECTED [FAIL 404].', error: true },
+                { id: 'p6', msg: 'LOGIC: Shifting to REDUNDANCY #1 (ChatGPT)...' },
+                { id: 'chatgpt-node', msg: 'CHATGPT: Secondary node active. Delivering.' },
+                { id: 'ret_gpt', msg: 'FAILOVER: Redundant delivery finalized.' }
+            ],
+            m3: [
+                { id: 'user-node', msg: 'USER: Broadcasting query to Helios Interface...' },
+                { id: 'p1', msg: 'FRONTEND: Syncing telemetry and schema...' },
+                { id: 'fe-node', msg: 'FRONTEND: Secured request tunnel established.' },
+                { id: 'p2', msg: 'BACKEND: Routing request to Orchestrator...' },
+                { id: 'be-node', msg: 'BACKEND: Initializing environment validation...' },
+                { id: 'p3_up', msg: 'AUTH: Security audit in progress...' },
+                { id: 'auth-node', msg: 'AUTH: Audit Success.' },
+                { id: 'p3_dn', msg: 'BACKEND: Handshake OK.' },
+                { id: 'p4', msg: 'ROUTER: Passing payload to Logic Engine...' },
+                { id: 'logic-node', msg: 'LOGIC: Attempting priority sequence...' },
+                { id: 'p5', msg: 'GEMINI AI: Attempting connection...', fail: true },
+                { id: 'gemini-node', msg: 'GEMINI: OFFLINE [FAIL].', error: true },
+                { id: 'p6', msg: 'CHATGPT: Attempting Failover...', fail: true },
+                { id: 'chatgpt-node', msg: 'CHATGPT: QUOTA EXCEEDED [FAIL 429].', error: true },
+                { id: 'p7', msg: 'LOGIC: Emergency shift to Groq AI...' },
+                { id: 'groq-node', msg: 'GROQ: Critical failover node responding.' },
+                { id: 'ret_groq', msg: 'RESILIENCE: Result delivered via Groq backup.' }
+            ]
+        };
+
+        function selectCase(m) {
+            activeMode = m;
+            currentStepIndex = 0;
+            resetUI();
+            document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('c' + (m === 'm1' ? '1' : m === 'm2' ? '2' : '3')).classList.add('active');
+            document.getElementById('next').disabled = false;
+            moveStep(1);
+        }
+
+        function resetUI() {
+            document.querySelectorAll('.block, path').forEach(el => {
+                el.classList.remove('visible', 'highlight', 'active', 'error', 'fail');
+            });
+            document.getElementById('status').innerText = "READY TO SIMULATE CASE...";
+            document.getElementById('prev').disabled = true;
+        }
+
+        function moveStep(dir) {
+            if (!activeMode) return;
+
+            if (dir === 1) {
+                const step = sequences[activeMode][currentStepIndex];
+                const el = document.getElementById(step.id);
+                if (el.tagName === 'DIV') {
+                    el.classList.add('visible', 'highlight');
+                    if (step.error) el.classList.add('error');
+                } else {
+                    el.classList.add('visible', 'active');
+                    if (step.fail) el.classList.add('fail');
+                }
+                document.getElementById('status').innerText = step.msg;
+                currentStepIndex++;
+            } else {
+                currentStepIndex--;
+                const step = sequences[activeMode][currentStepIndex];
+                const el = document.getElementById(step.id);
+                el.classList.remove('visible', 'highlight', 'active', 'error', 'fail');
+
+                if (currentStepIndex > 0) {
+                    const prevStep = sequences[activeMode][currentStepIndex - 1];
+                    document.getElementById('status').innerText = prevStep.msg;
+                } else {
+                    document.getElementById('status').innerText = "READY TO SIMULATE CASE...";
+                }
+            }
+
+            document.getElementById('next').disabled = currentStepIndex >= sequences[activeMode].length;
+            document.getElementById('prev').disabled = currentStepIndex <= 0;
+        }
+    </script>
+
+</body>
+
+</html>

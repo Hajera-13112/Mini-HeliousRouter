@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Router | Master Architecture v9</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap');
+
+        :root {
+            --bg: #030308;
+            --glass: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent: #00ff41;
+            --primary: #5e5ce6;
+            --fail: #ff3b30;
+            --text: #ffffff;
+            --text-dim: #71717a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 16:9 Aspect Ratio Container */
+        .stage {
+            position: relative;
+            width: 95vw;
+            height: 53.43vw;
+            /* 16:9 scaled to width */
+            max-height: 95vh;
+            max-width: 168.88vh;
+            /* 16:9 scaled to height */
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header {
+            position: absolute;
+            top: 5%;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 2vw;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 0.8vw;
+            margin-top: 5px;
+        }
+
+        /* SVG layer for Rectilinear Paths */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.03);
+            stroke-width: 2;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        path.visible {
+            opacity: 1;
+            stroke: #222;
+        }
+
+        path.active {
+            opacity: 1;
+            stroke: var(--accent);
+            stroke-width: 3;
+            stroke-dasharray: 6;
+            animation: dash 1s linear infinite;
+        }
+
+        path.fail {
+            stroke: var(--fail);
+        }
+
+        path.return {
+            stroke: var(--primary);
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+
+        /* Component Blocks */
+        .block {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1vw;
+            display: flex;
+            flex-direction: column;
+            z-index: 5;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .block.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        .block.err {
+            border-color: var(--fail);
+        }
+
+        .block h3 {
+            margin: 0;
+            font-size: 0.9vw;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .comp-list {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4px;
+        }
+
+        .comp-item {
+            font-size: 0.65vw;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Positions */
+        #node-user {
+            top: 40%;
+            left: 5%;
+            width: 8vw;
+        }
+
+        #node-fe {
+            top: 35%;
+            left: 16%;
+            width: 14vw;
+        }
+
+        #node-be {
+            top: 35%;
+            left: 34%;
+            width: 16vw;
+        }
+
+        #node-auth {
+            top: 10%;
+            left: 34%;
+            width: 16vw;
+        }
+
+        #node-logic {
+            top: 65%;
+            left: 16%;
+            width: 14vw;
+        }
+
+        #node-gemini {
+            top: 10%;
+            right: 5%;
+            width: 14vw;
+        }
+
+        #node-chatgpt {
+            top: 40%;
+            right: 5%;
+            width: 14vw;
+        }
+
+        #node-groq {
+            top: 70%;
+            right: 5%;
+            width: 14vw;
+        }
+
+        /* Controls */
+        .bottom-shelf {
+            position: absolute;
+            bottom: 5%;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .btn {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 0.8vw 1.6vw;
+            border-radius: 8px;
+            font-size: 0.75vw;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 10px;
+            margin-left: 20px;
+        }
+
+        .mode-shelf {
+            position: absolute;
+            top: 5.5%;
+            right: 5%;
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-msg {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7vw;
+            text-transform: uppercase;
+        }
+
+        /* Pulse */
+        .pulse {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>HELIOS ROUTER MASTER ENGINE v9</h1>
+        <p>High-Precision Methodology | 16:9 Rectilinear Architecture</p>
+    </header>
+
+    <div class="mode-shelf">
+        <button class="btn" id="m1" onclick="selectMode('m1')">Case 1: Gemini Success</button>
+        <button class="btn" id="m2" onclick="selectMode('m2')">Case 2: Gemini Fail -> ChatGPT</button>
+        <button class="btn" id="m3" onclick="selectMode('m3')">Case 3: Full Failover (Groq)</button>
+    </div>
+
+    <div class="stage">
+        <svg id="svg-layer">
+            <!-- RECTILINEAR PATHS -->
+            <!-- UI to FE -->
+            <path id="path-ui-fe" d="M 13% 45% L 16% 45%" />
+
+            <!-- FE to BE -->
+            <path id="path-fe-be" d="M 30% 45% L 34% 45%" />
+
+            <!-- BE to Auth (L-shaps) -->
+            <path id="path-be-auth-up" d="M 38% 35% L 38% 25%" />
+            <path id="path-be-auth-dn" d="M 46% 25% L 46% 35%" />
+
+            <!-- BE to Logic -->
+            <path id="path-be-logic" d="M 34% 50% L 32% 50% L 32% 75% L 30% 75%" />
+
+            <!-- Logic to Gemini (Precise routing) -->
+            <path id="path-logic-gem" d="M 30% 80% L 75% 80% L 75% 15% L 81% 15%" />
+
+            <!-- Failovers -->
+            <path id="path-fail-gem-gpt" d="M 88% 25% L 88% 30% L 95% 30% L 95% 40%" />
+            <path id="path-fail-gpt-groq" d="M 88% 55% L 88% 60% L 95% 60% L 95% 70%" />
+
+            <!-- Return Arrows (Direct to User) -->
+            <path id="ret-gem" d="M 81% 12% L 60% 12% L 60% 8% L 9% 8% L 9% 40%" class="return" />
+            <path id="ret-gpt" d="M 81% 45% L 9% 45%" class="return" />
+            <path id="ret-groq" d="M 81% 82% L 60% 82% L 60% 92% L 9% 92% L 9% 50%" class="return" />
+        </svg>
+
+        <!-- Components -->
+        <div id="node-user" class="block">
+            <h3>User UI</h3>
+            <p>End Point</p>
+        </div>
+
+        <div id="node-fe" class="block">
+            <h3>Frontend Layer</h3>
+            <div class="comp-list">
+                <span class="comp-item">User Dashboard</span>
+                <span class="comp-item">Chat Interface</span>
+                <span class="comp-item">Status HUD</span>
+                <span class="comp-item">Model Switcher</span>
+            </div>
+        </div>
+
+        <div id="node-be" class="block">
+            <h3>Backend API</h3>
+            <div class="comp-list">
+                <span class="comp-item">API Controller</span>
+                <span class="comp-item">Request Router</span>
+                <span class="comp-item">Telemetry Sync</span>
+                <span class="comp-item">Env Validator</span>
+            </div>
+        </div>
+
+        <div id="node-auth" class="block">
+            <h3>Authentication</h3>
+            <div class="comp-list">
+                <span class="comp-item">Module Validation</span>
+                <span class="comp-item">Token Verification</span>
+                <span class="comp-item">Auth Handshake</span>
+            </div>
+        </div>
+
+        <div id="node-logic" class="block">
+            <h3>Router Logic</h3>
+            <p>Condition Handler</p>
+        </div>
+
+        <!-- AI Matrix -->
+        <div id="node-gemini" class="block">
+            <h3>Gemini AI</h3>
+            <p>Priority Node</p>
+        </div>
+
+        <div id="node-chatgpt" class="block">
+            <h3>ChatGPT</h3>
+            <p>Redundancy #1</p>
+        </div>
+
+        <div id="node-groq" class="block">
+            <h3>Groq AI</h3>
+            <p>Redundancy #2</p>
+        </div>
+
+        <div id="pulse" class="pulse"></div>
+    </div>
+
+    <div class="bottom-shelf">
+        <div class="status-msg" id="status-text">Select Case to Start Presentation</div>
+        <div class="nav-group">
+            <button class="btn" id="btn-back" onclick="prevStep()" disabled>Step Back</button>
+            <button class="btn primary" id="btn-next" onclick="nextStep()" disabled>Next Step</button>
+            <button class="btn" onclick="reset()">Clear</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let mode = '';
+        const pulse = document.getElementById('pulse');
+        const status = document.getElementById('status-text');
+
+        const sequences = {
+            m1: [
+                { id: 'node-user', text: 'Step 1: User broadacasts request.' },
+                { id: 'path-ui-fe', text: 'Moving to Frontend Interface.' },
+                { id: 'node-fe', text: 'Frontend components initialized.' },
+                { id: 'path-fe-be', text: 'Forwarding to Backend API layer.' },
+                { id: 'node-be', text: 'Backend Controller managing request.' },
+                { id: 'path-be-auth-up', text: 'Initiating Security Handshake (UP).' },
+                { id: 'node-auth', text: 'Token Verification processing.' },
+                { id: 'path-be-auth-dn', text: 'Authentication validated (DOWN).' },
+                { id: 'path-be-logic', text: 'Transferring to Helios Router Logic.' },
+                { id: 'node-logic', text: 'Priority found: Gemini AI.' },
+                { id: 'path-logic-gem', text: 'Opening connection to Gemini node.' },
+                { id: 'node-gemini', text: 'Gemini generating response.' },
+                { id: 'ret-gem', text: 'Direct Output loop back to User UI (COMPLETE).' }
+            ],
+            m2: [
+                { id: 'node-user', text: 'Step 1: User broadcasts request.' },
+                { id: 'path-ui-fe', text: 'Moving to Frontend Interface.' },
+                { id: 'node-fe', text: 'Frontend components initialized.' },
+                { id: 'path-fe-be', text: 'Forwarding to Backend API layer.' },
+                { id: 'node-be', text: 'Backend Controller managing request.' },
+                { id: 'path-be-auth-up', text: 'Initiating Security Handshake (UP).' },
+                { id: 'node-auth', text: 'Token Verification processing.' },
+                { id: 'path-be-auth-dn', text: 'Authentication validated (DOWN).' },
+                { id: 'path-be-logic', text: 'Transferring to Helios Router Logic.' },
+                { id: 'node-logic', text: 'Gemini Attempt #1: FAIL 404.' },
+                { id: 'path-logic-gem', text: 'Redirecting to Gemini node...', err: true },
+                { id: 'node-gemini', text: 'Gemini unavailable. Failover #1.', err: true },
+                { id: 'path-fail-gem-gpt', text: 'Sequential shift to ChatGPT.', err: true },
+                { id: 'node-chatgpt', text: 'ChatGPT active. Generating output.' },
+                { id: 'ret-gpt', text: 'Direct Output loop back to User UI (COMPLETE).' }
+            ],
+            m3: [
+                { id: 'node-user', text: 'Step 1: User broadacasts request.' },
+                { id: 'path-ui-fe', text: 'Moving to Frontend Interface.' },
+                { id: 'node-fe', text: 'Frontend components initialized.' },
+                { id: 'path-fe-be', text: 'Forwarding to Backend API layer.' },
+                { id: 'node-be', text: 'Backend Controller managing request.' },
+                { id: 'path-be-auth-up', text: 'Initiating Security Handshake (UP).' },
+                { id: 'node-auth', text: 'Token Verification processing.' },
+                { id: 'path-be-auth-dn', text: 'Authentication validated (DOWN).' },
+                { id: 'path-be-logic', text: 'Transferring to Helios Router Logic.' },
+                { id: 'node-logic', text: 'Gemini Attempt #1: FAIL 404.' },
+                { id: 'path-logic-gem', text: 'Redirecting to Gemini node...', err: true },
+                { id: 'node-gemini', text: 'Gemini unavailable. Failover #1.', err: true },
+                { id: 'path-fail-gem-gpt', text: 'Shift to ChatGPT...', err: true },
+                { id: 'node-chatgpt', text: 'ChatGPT Attempt #2: FAIL 429.', err: true },
+                { id: 'path-fail-gpt-groq', text: 'Final shift to Groq AI.', err: true },
+                { id: 'node-groq', text: 'Groq Resilient Node found. Generating.' },
+                { id: 'ret-groq', text: 'Direct Output loop back to User UI (COMPLETE).' }
+            ]
+        };
+
+        function selectMode(m) {
+            mode = m;
+            reset();
+            document.querySelectorAll('.mode-shelf .btn').forEach(b => b.classList.remove('primary'));
+            document.getElementById(m).classList.add('primary');
+            document.getElementById('btn-next').disabled = false;
+            nextStep();
+        }
+
+        function reset() {
+            currentStep = 0;
+            document.querySelectorAll('.block, path').forEach(el => {
+                el.classList.remove('visible', 'active', 'err');
+            });
+            pulse.style.opacity = '0';
+            status.innerText = mode ? 'READY' : 'SELECT CASE';
+            document.getElementById('btn-back').disabled = true;
+            if (!mode) document.getElementById('btn-next').disabled = true;
+        }
+
+        function nextStep() {
+            if (!mode || currentStep >= sequences[mode].length) return;
+
+            const step = sequences[mode][currentStep];
+            const el = document.getElementById(step.id);
+
+            if (el.tagName === 'DIV') {
+                el.classList.add('visible', 'active');
+                if (step.err) el.classList.add('err');
+            } else {
+                el.classList.add('visible', 'active');
+                if (step.err) el.classList.add('fail');
+            }
+
+            status.innerText = step.text;
+            currentStep++;
+            updateNav();
+        }
+
+        function prevStep() {
+            if (currentStep <= 1) return;
+
+            currentStep--;
+            const lastStep = sequences[mode][currentStep];
+            const el = document.getElementById(lastStep.id);
+
+            el.classList.remove('visible', 'active', 'err', 'fail');
+
+            const prevStepIdx = currentStep - 1;
+            status.innerText = sequences[mode][prevStepIdx].text;
+            updateNav();
+        }
+
+        function updateNav() {
+            document.getElementById('btn-back').disabled = currentStep <= 1;
+            document.getElementById('btn-next').disabled = currentStep >= sequences[mode].length;
+        }
+    </script>
+
+</body>
+
+</html>

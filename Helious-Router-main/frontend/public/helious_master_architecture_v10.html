@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Router | Master Architecture v10</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap');
+
+        :root {
+            --bg: #020205;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #00ff41;
+            --primary: #5e5ce6;
+            --fail: #ff3b30;
+            --text: #ffffff;
+            --text-dim: #a1a1aa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, #0a0a1a 0%, #020205 100%);
+        }
+
+        /* Fixed 16:9 Aspect Ratio Container */
+        .stage {
+            position: relative;
+            width: 95vw;
+            height: calc(95vw * 9 / 16);
+            max-width: calc(95vh * 16 / 9);
+            max-height: 95vh;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Header Area - No Overlaps */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .top-bar h1 {
+            font-size: 24px;
+            margin: 0;
+            letter-spacing: 3px;
+            font-weight: 600;
+            background: linear-gradient(180deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .top-bar p {
+            color: var(--text-dim);
+            font-size: 11px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        .mode-selector {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        /* SVG layer with stable coordinate system */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        path {
+            stroke-width: 2.5;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.5s, stroke 0.3s;
+        }
+
+        path.visible {
+            opacity: 1;
+            stroke: rgba(255, 255, 255, 0.08);
+        }
+
+        path.active {
+            opacity: 1;
+            stroke: var(--accent);
+            stroke-dasharray: 8;
+            animation: dash 1s linear infinite;
+        }
+
+        path.fail {
+            stroke: var(--fail);
+        }
+
+        path.return {
+            stroke: var(--primary);
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -16;
+            }
+        }
+
+        /* Component Blocks */
+        .block {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            z-index: 5;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .block.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+        }
+
+        .block.err {
+            border-color: var(--fail);
+        }
+
+        .block h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .comp-list {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+        .comp-tag {
+            font-size: 10px;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Exact Coordinate Based Positioning (for 1600x900 space) */
+        /* These will be used with left/top in % calculated against 1600/900 */
+        #node-user {
+            left: 5%;
+            top: 40%;
+            width: 120px;
+        }
+
+        #node-fe {
+            left: 16%;
+            top: 35%;
+            width: 220px;
+        }
+
+        #node-be {
+            left: 36%;
+            top: 35%;
+            width: 260px;
+        }
+
+        #node-auth {
+            left: 36%;
+            top: 18%;
+            width: 260px;
+        }
+
+        #node-logic {
+            left: 16%;
+            top: 68%;
+            width: 220px;
+        }
+
+        #node-gemini {
+            right: 5%;
+            top: 12%;
+            width: 220px;
+        }
+
+        #node-chatgpt {
+            right: 5%;
+            top: 40%;
+            width: 220px;
+        }
+
+        #node-groq {
+            right: 5%;
+            top: 68%;
+            width: 220px;
+        }
+
+        /* Controls Area */
+        .bottom-bar {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 30;
+        }
+
+        .btn {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+        }
+
+        .status-box {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 400px;
+            text-align: center;
+        }
+
+        /* Pulse */
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stage">
+        <div class="top-bar">
+            <h1>HELIOS ROUTER MASTER SYSTEM</h1>
+            <p>Precision Architectural Visualization v10</p>
+
+            <div class="mode-selector">
+                <button class="btn" id="m1" onclick="startMode('m1')">Normal Flow</button>
+                <button class="btn" id="m2" onclick="startMode('m2')">Partial Failover (ChatGPT)</button>
+                <button class="btn" id="m3" onclick="startMode('m3')">Critical Failover (Groq)</button>
+            </div>
+        </div>
+
+        <!-- SVGs - Coordinate Space is 0 to 100 for percentage-based Rectilinear flow -->
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <!-- 1: User to FE -->
+            <path id="p1" d="M 125 450 L 160 450" />
+
+            <!-- 2: FE to Backend -->
+            <path id="p2" d="M 300 450 L 360 450" />
+
+            <!-- 3: Backend to Auth (Bidirectional Handshake) -->
+            <path id="p3a" d="M 400 350 L 400 250" />
+            <path id="p3b" d="M 460 250 L 460 350" />
+
+            <!-- 4: Backend to Logic -->
+            <path id="p4" d="M 360 480 L 330 480 L 330 750 L 300 750" />
+
+            <!-- 5: Logic to Gemini (Long rectilinear) -->
+            <path id="p5" d="M 300 750 L 750 750 L 750 180 L 810 180" />
+
+            <!-- 6: Gemini Failure to ChatGPT -->
+            <path id="p6" d="M 880 250 L 880 340 L 950 340 L 950 400" />
+
+            <!-- 7: ChatGPT Failure to Groq -->
+            <path id="p7" d="M 880 520 L 880 620 L 950 620 L 950 680" />
+
+            <!-- Returns back to User UI (Direct paths) -->
+            <path id="ret-gem" d="M 810 150 L 500 150 L 500 80 L 100 80 L 100 400" class="return" />
+            <path id="ret-gpt" d="M 810 450 L 100 450" class="return" />
+            <path id="ret-groq" d="M 810 750 L 500 750 L 500 920 L 100 920 L 100 500" class="return" />
+        </svg>
+
+        <!-- Component Blocks -->
+        <div id="node-user" class="block">
+            <h3>User UI</h3>
+            <p style="font-size:9px">Terminal Interaction</p>
+        </div>
+
+        <div id="node-fe" class="block">
+            <h3>Frontend Layer</h3>
+            <div class="comp-list">
+                <span class="comp-tag">React Engine</span>
+                <span class="comp-tag">Context Provider</span>
+                <span class="comp-tag">Telemetry Sync</span>
+            </div>
+        </div>
+
+        <div id="node-be" class="block">
+            <h3>Backend API</h3>
+            <div class="comp-list">
+                <span class="comp-tag">Node.js Controller</span>
+                <span class="comp-tag">Router Orchestrator</span>
+                <span class="comp-tag">Env Validator</span>
+            </div>
+        </div>
+
+        <div id="node-auth" class="block">
+            <h3>Authentication</h3>
+            <div class="comp-list">
+                <span class="comp-tag">JWT Verification</span>
+                <span class="comp-tag">API Key Guard</span>
+                <span class="comp-tag">Audit Handshake</span>
+            </div>
+        </div>
+
+        <div id="node-logic" class="block">
+            <h3>Router Logic</h3>
+            <div class="comp-list">
+                <span class="comp-tag">Priority Engine</span>
+                <span class="comp-tag">Failover Chain</span>
+            </div>
+        </div>
+
+        <!-- AI Providers -->
+        <div id="node-gemini" class="block">
+            <h3>Gemini AI</h3>
+            <span class="comp-tag">1st Target</span>
+        </div>
+
+        <div id="node-chatgpt" class="block">
+            <h3>ChatGPT</h3>
+            <span class="comp-tag">2nd Target</span>
+        </div>
+
+        <div id="node-groq" class="block">
+            <h3>Groq AI</h3>
+            <span class="comp-tag">3rd Target</span>
+        </div>
+
+        <div id="pulse" class="pulse"></div>
+
+        <div class="bottom-bar">
+            <button class="btn" id="btn-back" onclick="goBack()" disabled>Step Back</button>
+            <div class="status-box" id="status-text">Select a scenario to start</div>
+            <button class="btn primary" id="btn-next" onclick="goNext()" disabled>Next Step</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let mode = '';
+        const status = document.getElementById('status-text');
+        const pulse = document.getElementById('pulse');
+
+        const roadmap = {
+            m1: [
+                { id: 'node-user', text: 'Step 1: User request initiated.' },
+                { id: 'p1', text: 'Broadcasting to Frontend Layer.' },
+                { id: 'node-fe', text: 'Step 2: Frontend assets loaded.' },
+                { id: 'p2', text: 'Forwarding to Secured Backend API.' },
+                { id: 'node-be', text: 'Step 3: Backend processing request.' },
+                { id: 'p3a', text: 'Triggering Auth Handshake (UP).' },
+                { id: 'node-auth', text: 'Step 4: Authentication Audit Success.' },
+                { id: 'p3b', text: 'Permission Token Received (DOWN).' },
+                { id: 'p4', text: 'Entering Helios Router Logic.' },
+                { id: 'node-logic', text: 'Priority Analysis: Target Gemini AI.' },
+                { id: 'p5', text: 'Opening connection to Gemini node.' },
+                { id: 'node-gemini', text: 'Step 5: Gemini processing response.' },
+                { id: 'ret-gem', text: 'Final Step: Result delivered to User UI.' }
+            ],
+            m2: [
+                { id: 'node-user', text: 'Step 1: User request initiated.' },
+                { id: 'p1', text: 'Broadcasting to Frontend Layer.' },
+                { id: 'node-fe', text: 'Step 2: Frontend assets loaded.' },
+                { id: 'p2', text: 'Forwarding to Secured Backend API.' },
+                { id: 'node-be', text: 'Step 3: Backend processing request.' },
+                { id: 'p3a', text: 'Triggering Auth Handshake (UP).' },
+                { id: 'node-auth', text: 'Step 4: Authentication Audit Success.' },
+                { id: 'p3b', text: 'Permission Token Received (DOWN).' },
+                { id: 'p4', text: 'Entering Helios Router Logic.' },
+                { id: 'node-logic', text: 'Targeting Gemini... FAILURE [404].', err: true },
+                { id: 'p5', text: 'Gemini node unreachable.', fail: true },
+                { id: 'node-gemini', text: 'Attempt #1 FAILED. Initiating Failover.', err: true },
+                { id: 'p6', text: 'Sequential Shift to ChatGPT.', fail: true },
+                { id: 'node-chatgpt', text: 'Step 5: ChatGPT handling redundancy.' },
+                { id: 'ret-gpt', text: 'Final Step: Redundant delivery finalized.' }
+            ],
+            m3: [
+                { id: 'node-user', text: 'Step 1: User request initiated.' },
+                { id: 'p1', text: 'Broadcasting to Frontend Layer.' },
+                { id: 'node-fe', text: 'Step 2: Frontend assets loaded.' },
+                { id: 'p2', text: 'Forwarding to Secured Backend API.' },
+                { id: 'node-be', text: 'Step 3: Backend processing request.' },
+                { id: 'p3a', text: 'Triggering Auth Handshake (UP).' },
+                { id: 'node-auth', text: 'Step 4: Authentication Audit Success.' },
+                { id: 'p3b', text: 'Permission Token Received (DOWN).' },
+                { id: 'p4', text: 'Entering Helios Router Logic.' },
+                { id: 'node-logic', text: 'Targeting Gemini... FAILURE [404].', err: true },
+                { id: 'node-gemini', text: 'Gemini Node Offline.', err: true },
+                { id: 'p6', text: 'Targeting ChatGPT... FAILURE [429].', fail: true },
+                { id: 'node-chatgpt', text: 'ChatGPT Quota Exceeded.', err: true },
+                { id: 'p7', text: 'Final Emergency Shift to Groq AI.', fail: true },
+                { id: 'node-groq', text: 'Step 5: Groq Resilient Node Active.' },
+                { id: 'ret-groq', text: 'Final Step: Extreme resilience verified.' }
+            ]
+        };
+
+        function startMode(m) {
+            mode = m;
+            resetAll();
+            document.querySelectorAll('.mode-selector .btn').forEach(b => b.classList.remove('primary'));
+            document.getElementById(m).classList.add('primary');
+            document.getElementById('btn-next').disabled = false;
+            goNext();
+        }
+
+        function resetAll() {
+            currentStep = 0;
+            document.querySelectorAll('.block, path').forEach(el => {
+                el.classList.remove('visible', 'active', 'err', 'fail');
+            });
+            pulse.style.opacity = '0';
+            status.innerText = "Ready to simulate";
+            document.getElementById('btn-back').disabled = true;
+        }
+
+        function goNext() {
+            if (!mode || currentStep >= roadmap[mode].length) return;
+
+            const data = roadmap[mode][currentStep];
+            const el = document.getElementById(data.id);
+
+            if (el.tagName === 'DIV') {
+                document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+                el.classList.add('visible', 'active');
+                if (data.err) el.classList.add('err');
+            } else {
+                el.classList.add('visible', 'active');
+                if (data.fail) el.classList.add('fail');
+            }
+
+            status.innerText = data.text;
+            currentStep++;
+            checkButtons();
+        }
+
+        function goBack() {
+            if (currentStep <= 1) return;
+
+            currentStep--;
+            const lastData = roadmap[mode][currentStep];
+            const el = document.getElementById(lastData.id);
+
+            el.classList.remove('visible', 'active', 'err', 'fail');
+
+            const prevIdx = currentStep - 1;
+            status.innerText = roadmap[mode][prevIdx].text;
+
+            // Ensure previous block stays active
+            if (roadmap[mode][prevIdx].id.startsWith('node')) {
+                document.getElementById(roadmap[mode][prevIdx].id).classList.add('active');
+            }
+
+            checkButtons();
+        }
+
+        function checkButtons() {
+            document.getElementById('btn-back').disabled = currentStep <= 1;
+            document.getElementById('btn-next').disabled = currentStep >= roadmap[mode].length;
+        }
+    </script>
+
+</body>
+
+</html>

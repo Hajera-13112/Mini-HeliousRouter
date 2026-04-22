@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Router | Master Architecture Flow v7</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap');
+
+        :root {
+            --bg: #05060b;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #5e5ce6;
+            --success: #30d158;
+            --fail: #ff453a;
+            --text: #ffffff;
+            --text-dim: #a1a1aa;
+            --num-bg: #30d158;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% -20%, #1c1c3a, #05060b);
+        }
+
+        header {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -1.5px;
+            background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .canvas {
+            position: relative;
+            width: 1200px;
+            height: 700px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        /* SVG Paths */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 2;
+            transition: all 0.5s;
+        }
+
+        .active-path {
+            stroke: var(--num-bg);
+            stroke-width: 3;
+            stroke-dasharray: 6;
+            animation: dash 0.8s linear infinite;
+            filter: drop-shadow(0 0 5px var(--num-bg));
+        }
+
+        .fail-path {
+            stroke: var(--fail);
+            stroke-dasharray: 6;
+            animation: dash 0.8s linear infinite;
+        }
+
+        .ret-path {
+            stroke: #5e5ce6;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+
+        /* Component Blocks */
+        .block {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .block h3 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .block p {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            margin-bottom: 0;
+        }
+
+        /* Position Blocks */
+        #user-node {
+            left: 40px;
+            top: 300px;
+            width: 120px;
+        }
+
+        #fe-node {
+            left: 230px;
+            top: 280px;
+            width: 180px;
+            height: 140px;
+        }
+
+        #be-node {
+            left: 500px;
+            top: 280px;
+            width: 220px;
+            height: 140px;
+        }
+
+        #auth-node {
+            left: 500px;
+            top: 100px;
+            width: 220px;
+        }
+
+        #logic-node {
+            left: 230px;
+            top: 500px;
+            width: 180px;
+        }
+
+        #gemini-node {
+            left: 850px;
+            top: 100px;
+            width: 180px;
+        }
+
+        #chatgpt-node {
+            left: 850px;
+            top: 300px;
+            width: 180px;
+        }
+
+        #groq-node {
+            left: 850px;
+            top: 500px;
+            width: 180px;
+        }
+
+        .active-block {
+            border-color: var(--num-bg);
+            background: rgba(48, 209, 88, 0.08);
+            box-shadow: 0 0 30px rgba(48, 209, 88, 0.15);
+        }
+
+        .err-block {
+            border-color: var(--fail);
+            background: rgba(255, 69, 58, 0.1);
+        }
+
+        /* Circle Numbers */
+        .num {
+            width: 24px;
+            height: 24px;
+            background: var(--num-bg);
+            color: black;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            z-index: 10;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .num.show {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Pulse Dot */
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--num-bg);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 15px var(--num-bg);
+            opacity: 0;
+            z-index: 100;
+        }
+
+        /* Log HUD */
+        .hud {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 380px;
+            height: 110px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--success);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            background: #111;
+            border: 1px solid #333;
+            color: #ccc;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Provider Icons */
+        .icon-box {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ic-g {
+            background: linear-gradient(45deg, #1e88e5, #9c27b0);
+        }
+
+        .ic-o {
+            background: #10a37f;
+        }
+
+        .ic-gr {
+            background: #f68b1e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>HELIOS ROUTER</h1>
+        <p>Professional Enterprise Architecture System Flow</p>
+    </header>
+
+    <div class="canvas">
+        <svg>
+            <!-- 1: User to FE -->
+            <path id="p1" d="M 160 350 L 230 350" />
+            <path id="p2" d="M 410 350 L 500 350" />
+
+            <!-- 3: BE to Auth (Bidirectional) -->
+            <path id="p3a" d="M 580 280 L 580 200" />
+            <path id="p3b" d="M 640 200 L 640 280" />
+
+            <!-- 4: BE to Logic -->
+            <path id="p4" d="M 500 400 Q 320 400, 320 500" />
+
+            <!-- 5: Logic to Gemini -->
+            <path id="p5" d="M 410 550 Q 750 550, 750 150 L 850 150" />
+
+            <!-- 6: Failover sequence -->
+            <path id="p6" d="M 940 200 L 940 300" />
+            <path id="p7" d="M 940 400 L 940 500" />
+
+            <!-- ChatGPT return to Logic -->
+            <path id="p-chat-ret" d="M 850 350 Q 800 350, 800 450 Q 800 550, 410 550" />
+
+            <!-- Final Returns to User Interface -->
+            <path id="ret-gem" d="M 850 120 Q 500 50, 100 300" class="ret-path" />
+            <path id="ret-gpt" d="M 850 320 Q 500 200, 100 320" class="ret-path" />
+            <path id="ret-groq" d="M 850 550 Q 500 650, 100 380" class="ret-path" />
+
+            <!-- Logic return to UI -->
+            <path id="ret-logic" d="M 230 550 Q 100 550, 100 400" class="ret-path" />
+        </svg>
+
+        <!-- Numbers -->
+        <div id="n1" class="num" style="left: 185px; top: 320px;">1</div>
+        <div id="n2" class="num" style="left: 445px; top: 320px;">2</div>
+        <div id="n3" class="num" style="left: 550px; top: 230px;">3</div>
+        <div id="n4" class="num" style="left: 450px; top: 430px;">4</div>
+        <div id="n5" class="num" style="left: 600px; top: 520px;">5</div>
+        <div id="n6" class="num" style="left: 955px; top: 240px;">6</div>
+        <div id="n7" class="num" style="left: 955px; top: 440px;">7</div>
+
+        <!-- Components -->
+        <div class="block" id="user-node">
+            <span>👤</span>
+            <h3>User</h3>
+            <p>End User</p>
+        </div>
+
+        <div class="block" id="fe-node">
+            <span>🖥️</span>
+            <h3>Frontend</h3>
+            <p>React / Client App</p>
+        </div>
+
+        <div class="block" id="be-node">
+            <span>⚙️</span>
+            <h3>Backend API</h3>
+            <p>Node.js / Express</p>
+        </div>
+
+        <div class="block" id="auth-node">
+            <span>🔑</span>
+            <h3>Authentication</h3>
+            <p>Module Validation</p>
+        </div>
+
+        <div class="block" id="logic-node">
+            <span>⚡</span>
+            <h3>Router Logic</h3>
+            <p>Sequence Manager</p>
+        </div>
+
+        <!-- LLMs -->
+        <div class="block" id="gemini-node">
+            <div class="icon-box ic-g">✦</div>
+            <h3>Gemini AI</h3>
+            <p>1st Attempt</p>
+        </div>
+
+        <div class="block" id="chatgpt-node">
+            <div class="icon-box ic-o">S</div>
+            <h3>ChatGPT</h3>
+            <p>2nd Attempt</p>
+        </div>
+
+        <div class="block" id="groq-node">
+            <div class="icon-box ic-gr">G</div>
+            <h3>Groq AI</h3>
+            <p>Final Fallback</p>
+        </div>
+
+        <div id="pulse" class="pulse"></div>
+
+        <div class="hud" id="hud">> Ready for simulation.</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="startFlow('standard')">Standard Flow (1->2->3->4->5)</button>
+        <button class="btn" onclick="startFlow('failover')">Full Failover (1-7 Sequence)</button>
+    </div>
+
+    <script>
+        const pulse = document.getElementById('pulse');
+        const hud = document.getElementById('hud');
+
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.style.color = type === 'err' ? 'var(--fail)' : (type === 'ok' ? 'var(--success)' : 'var(--num-bg)');
+            div.innerText = `> ${new Date().toLocaleTimeString()} | ${msg}`;
+            hud.prepend(div);
+        }
+
+        async function movePulse(pathId, duration, color = 'var(--num-bg)') {
+            const path = document.getElementById(pathId);
+            pulse.style.offsetPath = `path("${path.getAttribute('d')}")`;
+            pulse.style.background = color;
+            pulse.style.boxShadow = `0 0 15px ${color}`;
+            pulse.style.animation = 'none';
+            pulse.offsetHeight;
+            pulse.style.animation = `dash ${duration}s linear forwards`;
+            pulse.style.opacity = '1';
+            path.classList.add('active-path');
+            if (color === 'var(--fail)') path.classList.add('fail-path');
+
+            return new Promise(r => setTimeout(() => {
+                path.classList.remove('active-path', 'fail-path');
+                r();
+            }, duration * 1000));
+        }
+
+        async function showNum(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        async function startFlow(mode) {
+            // Reset
+            document.querySelectorAll('.block, .num').forEach(el => el.classList.remove('active-block', 'err-block', 'show'));
+            hud.innerHTML = "";
+
+            // Sequence
+            log("1. User initiating request.");
+            document.getElementById('user-node').classList.add('active-block');
+            await showNum('n1');
+            await movePulse('p1', 0.6);
+
+            log("2. Frontend routing to Backend API.");
+            document.getElementById('fe-node').classList.add('active-block');
+            await showNum('n2');
+            await movePulse('p2', 0.6);
+
+            log("3. Backend validating Authentication.");
+            document.getElementById('be-node').classList.add('active-block');
+            await movePulse('p3a', 0.4);
+            document.getElementById('auth-node').classList.add('active-block');
+            await showNum('n3');
+            await new Promise(r => setTimeout(r, 400));
+            await movePulse('p3b', 0.4);
+            log("Auth success [Bidirectional Check].", "ok");
+
+            log("4. Moving to Helios Router Logic.");
+            await showNum('n4');
+            await movePulse('p4', 0.7);
+            document.getElementById('logic-node').classList.add('active-block');
+
+            if (mode === 'standard') {
+                log("5. Attempting Primary [Gemini].");
+                await showNum('n5');
+                await movePulse('p5', 0.8);
+                document.getElementById('gemini-node').classList.add('active-block');
+                log("Success: Gemini delivering output.");
+                await movePulse('ret-gem', 1.2, 'var(--primary)');
+                document.getElementById('user-node').classList.add('active-block');
+                log("Session complete.", "ok");
+            }
+            else {
+                log("5. Attempting Primary [Gemini]...");
+                await showNum('n5');
+                await movePulse('p5', 0.6, 'var(--fail)');
+                document.getElementById('gemini-node').classList.add('err-block');
+                log("FAIL: Gemini 404.", "err");
+
+                log("6. Sequential Failover -> ChatGPT.");
+                await showNum('n6');
+                await movePulse('p6', 0.6, 'var(--fail)');
+                document.getElementById('chatgpt-node').classList.add('err-block');
+                log("FAIL: ChatGPT 429.", "err");
+
+                log("Returning status to Router Logic.");
+                await movePulse('p-chat-ret', 0.8, 'var(--fail)');
+
+                log("7. Final Fallback -> Groq AI.");
+                await showNum('n7');
+                await movePulse('p7', 0.7);
+                document.getElementById('groq-node').classList.add('active-block');
+                log("Success: Groq delivering via Llama-3.", "ok");
+
+                await movePulse('ret-groq', 1.2, 'var(--primary)');
+                document.getElementById('user-node').classList.add('active-block');
+                log("Resilient delivery finalized.", "ok");
+            }
+            pulse.style.opacity = '0';
+        }
+    </script>
+
+</body>
+
+</html>

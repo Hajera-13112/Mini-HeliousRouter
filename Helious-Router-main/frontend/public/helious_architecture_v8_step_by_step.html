@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helios Router | Precision Architecture v8</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Mono&display=swap');
+
+        :root {
+            --bg: #030308;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #30d158;
+            --primary: #5e5ce6;
+            --fail: #ff453a;
+            --text: #ffffff;
+            --text-dim: #71717a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at center, #111122 0%, #030308 100%);
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header {
+            position: absolute;
+            top: 40px;
+            text-align: center;
+            width: 100%;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        /* SVG layer for Rectilinear Paths */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 2;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        path.visible {
+            opacity: 1;
+            stroke: var(--text-dim);
+        }
+
+        path.active {
+            opacity: 1;
+            stroke: var(--accent);
+            stroke-width: 3;
+            stroke-dasharray: 8;
+            animation: dash 1s linear infinite;
+        }
+
+        path.fail {
+            stroke: var(--fail);
+        }
+
+        path.return {
+            stroke: var(--primary);
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -16;
+            }
+        }
+
+        /* Component Blocks */
+        .block {
+            position: absolute;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .block.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .block.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(48, 209, 88, 0.2);
+        }
+
+        .block.err {
+            border-color: var(--fail);
+            box-shadow: 0 0 20px rgba(255, 69, 58, 0.2);
+        }
+
+        .block h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .block p {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin: 4px 0 0 0;
+            text-align: center;
+        }
+
+        /* Positioning - Precision Matrix */
+        #node-user {
+            top: 350px;
+            left: 50px;
+            width: 120px;
+        }
+
+        #node-fe {
+            top: 340px;
+            left: 250px;
+            width: 160px;
+        }
+
+        #node-be {
+            top: 340px;
+            left: 500px;
+            width: 220px;
+        }
+
+        #node-auth {
+            top: 120px;
+            left: 500px;
+            width: 220px;
+        }
+
+        #node-logic {
+            top: 560px;
+            left: 250px;
+            width: 160px;
+        }
+
+        #node-gemini {
+            top: 120px;
+            right: 70px;
+            width: 180px;
+        }
+
+        #node-chatgpt {
+            top: 340px;
+            right: 70px;
+            width: 180px;
+        }
+
+        #node-groq {
+            top: 560px;
+            right: 70px;
+            width: 180px;
+        }
+
+        /* Interface controls */
+        .controls {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .btn {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .mode-selector {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .step-indicator {
+            position: absolute;
+            bottom: 100px;
+            color: var(--text-dim);
+            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Pulse */
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Helios Router Engine Architecture</h1>
+        <p style="color: grey; font-size: 12px; margin-top: 5px;">High-Precision Step-by-Step Methodology</p>
+    </header>
+
+    <div class="mode-selector">
+        <button class="btn" id="mode-normal" onclick="setMode('normal')">Normal Flow</button>
+        <button class="btn" id="mode-failover" onclick="setMode('failover')">Failover Flow</button>
+    </div>
+
+    <div class="container">
+        <svg id="svg-world">
+            <!-- RECTILINEAR (L-SHAPED) PATHS -->
+            <!-- 1: User to FE -->
+            <path id="flow-1" d="M 170 380 L 250 380" />
+
+            <!-- 2: FE to BE -->
+            <path id="flow-2" d="M 410 370 L 500 370" />
+
+            <!-- 3: BE to Auth (Bidirectional - Up) -->
+            <path id="flow-3a" d="M 580 340 L 580 200" />
+            <path id="flow-3b" d="M 640 200 L 640 340" />
+
+            <!-- 4: BE to Logic -->
+            <path id="flow-4" d="M 500 390 L 330 390 L 330 560" />
+
+            <!-- 5: Logic to Gemini -->
+            <path id="flow-5" d="M 410 590 L 750 590 L 750 150 L 950 150" />
+
+            <!-- 6: Failover Seq (L-shaps) -->
+            <!-- Gem to GPT -->
+            <path id="fail-6" d="M 1040 200 L 1040 340" />
+            <!-- GPT to Logic return -->
+            <path id="fail-gpt-ret" d="M 950 370 L 800 370 L 800 590 L 410 590" />
+            <!-- Logic to Groq -->
+            <path id="fail-7" d="M 410 610 L 950 610" />
+
+            <!-- Results to User (Direct) -->
+            <path id="res-gem" d="M 950 130 L 700 130 L 700 80 L 110 80 L 110 350" class="return" />
+            <path id="res-gpt" d="M 950 350 L 100 350" class="return" />
+            <path id="res-groq" d="M 950 580 L 700 580 L 700 680 L 110 680 L 110 430" class="return" />
+
+            <!-- Logic Status to User -->
+            <path id="res-logic" d="M 250 610 L 50 610 L 50 430" class="return" />
+        </svg>
+
+        <!-- Components -->
+        <div id="node-user" class="block">
+            <h3>User</h3>
+            <p>End Point</p>
+        </div>
+
+        <div id="node-fe" class="block">
+            <h3>Frontend</h3>
+            <p>React / Client</p>
+        </div>
+
+        <div id="node-be" class="block">
+            <h3>Backend API</h3>
+            <p>Express Engine</p>
+        </div>
+
+        <div id="node-auth" class="block">
+            <h3>Auth</h3>
+            <p>Token Validation</p>
+        </div>
+
+        <div id="node-logic" class="block">
+            <h3>Router Logic</h3>
+            <p>Decision Handler</p>
+        </div>
+
+        <div id="node-gemini" class="block">
+            <h3>Gemini AI</h3>
+            <p>Attempt #1</p>
+        </div>
+
+        <div id="node-chatgpt" class="block">
+            <h3>ChatGPT</h3>
+            <p>Attempt #2</p>
+        </div>
+
+        <div id="node-groq" class="block">
+            <h3>Groq AI</h3>
+            <p>Final Fallback</p>
+        </div>
+
+        <div id="pulse" class="pulse"></div>
+    </div>
+
+    <div class="step-indicator" id="step-text">CLICK 'NORMAL' OR 'FAILOVER' TO START</div>
+
+    <div class="controls">
+        <button class="btn" id="btn-reset" onclick="reset()">Reset</button>
+        <button class="btn primary" id="btn-next" onclick="nextStep()" disabled>Next Step</button>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        let mode = '';
+        const pulse = document.getElementById('pulse');
+        const stepText = document.getElementById('step-text');
+
+        const flows = {
+            normal: [
+                { id: 'node-user', text: 'Step 1: User initiates request.' },
+                { id: 'flow-1', text: 'Broadcasting to Frontend Layer.' },
+                { id: 'node-fe', text: 'Step 2: Frontend received input.' },
+                { id: 'flow-2', text: 'Routing to Backend Controller.' },
+                { id: 'node-be', text: 'Step 3: Backend processing started.' },
+                { id: 'flow-3a', text: 'Validating credentials (UP).' },
+                { id: 'node-auth', text: 'Step 4: Authenticator verifying.' },
+                { id: 'flow-3b', text: 'Validation Token Returned (DOWN).' },
+                { id: 'flow-4', text: 'Handing off to Router Logic Engine.' },
+                { id: 'node-logic', text: 'Step 5: Router evaluating priority.' },
+                { id: 'flow-5', text: 'Directing to Primary Model (Gemini).' },
+                { id: 'node-gemini', text: 'Step 6: Gemini generating response.' },
+                { id: 'res-gem', text: 'Final Step: Result delivered directly to User.' }
+            ],
+            failover: [
+                { id: 'node-user', text: 'Step 1: User initiates request.' },
+                { id: 'flow-1', text: 'Broadcasting to Frontend Layer.' },
+                { id: 'node-fe', text: 'Step 2: Frontend received input.' },
+                { id: 'flow-2', text: 'Routing to Backend Controller.' },
+                { id: 'node-be', text: 'Step 3: Backend processing started.' },
+                { id: 'flow-3a', text: 'Validating credentials (UP).' },
+                { id: 'node-auth', text: 'Step 4: Authenticator verifying.' },
+                { id: 'flow-3b', text: 'Validation Token Returned (DOWN).' },
+                { id: 'flow-4', text: 'Handing off to Router Logic Engine.' },
+                { id: 'node-logic', text: 'Step 5: Router evaluating priority.' },
+                { id: 'flow-5', text: 'Attempting Primary (Gemini) [FAIL 404].', fail: true },
+                { id: 'node-gemini', text: 'Gemini Node Error. Triggering Failover.', err: true },
+                { id: 'fail-6', text: 'Attempting Secondary (ChatGPT) [FAIL 429].', fail: true },
+                { id: 'node-chatgpt', text: 'ChatGPT Quota Exceeded. Returning to Logic.', err: true },
+                { id: 'fail-gpt-ret', text: 'Logic Engine reprocessing metadata.' },
+                { id: 'fail-7', text: 'Emergency Fallback to Groq AI Node.' },
+                { id: 'node-groq', text: 'Step 6: Groq generating resilient output.' },
+                { id: 'res-groq', text: 'Final Step: Success delivered directly to User.' }
+            ]
+        };
+
+        function setMode(m) {
+            mode = m;
+            reset();
+            document.getElementById('mode-normal').style.borderColor = m === 'normal' ? 'var(--accent)' : '#333';
+            document.getElementById('mode-failover').style.borderColor = m === 'failover' ? 'var(--accent)' : '#333';
+            document.getElementById('btn-next').disabled = false;
+            nextStep();
+        }
+
+        function reset() {
+            currentStep = 0;
+            document.querySelectorAll('.block, path').forEach(el => {
+                el.classList.remove('visible', 'active', 'err', 'fail');
+            });
+            pulse.style.opacity = '0';
+            stepText.innerText = mode ? 'READY' : "SELECT MODE TO START";
+            if (!mode) document.getElementById('btn-next').disabled = true;
+        }
+
+        async function nextStep() {
+            if (!mode || currentStep >= flows[mode].length) return;
+
+            const stage = flows[mode][currentStep];
+            const el = document.getElementById(stage.id);
+
+            // Highlight
+            if (el.tagName === 'DIV') {
+                document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+                el.classList.add('visible', 'active');
+                if (stage.err) el.classList.add('err');
+            } else {
+                el.classList.add('visible', 'active');
+                if (stage.fail) el.classList.add('fail');
+                animatePulse(stage.id);
+            }
+
+            stepText.innerText = stage.text;
+            currentStep++;
+
+            if (currentStep >= flows[mode].length) {
+                document.getElementById('btn-next').disabled = true;
+                stepText.innerText += " - COMPLETE.";
+            }
+        }
+
+        function animatePulse(pathId) {
+            const path = document.getElementById(pathId);
+            if (!path) return;
+
+            pulse.style.offsetPath = `path("${path.getAttribute('d')}")`;
+            pulse.style.animation = 'none';
+            pulse.offsetHeight;
+            pulse.style.animation = 'dash 1s linear forwards';
+            pulse.style.opacity = '1';
+
+            setTimeout(() => { pulse.style.opacity = '0'; }, 1000);
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,223 @@
+{
+  "sessions": [
+    {
+      "id": "1774429287837",
+      "title": "New Chat",
+      "createdAt": "2026-03-25T09:01:27.837Z",
+      "updatedAt": "2026-03-25T09:01:27.837Z",
+      "conversations": [],
+      "promptCount": 0
+    },
+    {
+      "id": "1774428779949",
+      "title": "hello",
+      "createdAt": "2026-03-25T08:52:59.949Z",
+      "updatedAt": "2026-04-22T16:12:24.923Z",
+      "conversations": [
+        {
+          "id": 1774428801769,
+          "prompt": "hello",
+          "response": "Hello. It's nice to meet you. Is there something I can help you with or would you like to chat?",
+          "provider": "Groq",
+          "timestamp": "2026-03-25T08:53:21.769Z"
+        },
+        {
+          "id": 1774429089725,
+          "prompt": "hello",
+          "response": "Hello there! How can I help you today?",
+          "provider": "Gemini",
+          "timestamp": "2026-03-25T08:58:09.725Z"
+        },
+        {
+          "id": 1774429110194,
+          "prompt": "who is modi?",
+          "response": "Narendra Damodardas Modi is an **Indian politician** who has served as the **14th and current Prime Minister of India since 2014**.\n\nHere are some key facts about him:\n\n*   **Political Party:** He is a prominent leader of the **Bharatiya Janata Party (BJP)**, a major right-wing, Hindu nationalist political party in India.\n*   **Previous Role:** Prior to becoming Prime Minister, he served as the **Chief Minister of Gujarat** for over 12 years, from 2001 to 2014.\n*   **Political Ideology:** He is often described as a Hindu nationalist and his policies generally align with the BJP's platform, focusing on economic development, national security, and conservative social values.\n*   **Elections:** He led the BJP to a landslide victory in the 2014 general election, becoming Prime Minister, and was re-elected with an even larger majority in the 2019 general election.\n*   **Policies and Impact:** His administration has focused on various initiatives like \"Make in India\" (promoting domestic manufacturing), \"Swachh Bharat Abhiyan\" (cleanliness campaign), and demonetization. He has also been a strong advocate for India's foreign policy on the global stage.\n*   **Public Perception:** Modi is a highly popular and charismatic leader within India, commanding a significant following. However, his policies and leadership have also drawn considerable criticism and controversy, both domestically and internationally.",
+          "provider": "Gemini",
+          "timestamp": "2026-03-25T08:58:30.194Z"
+        },
+        {
+          "id": 1774429119719,
+          "prompt": "india capital?",
+          "response": "The capital of India is **New Delhi**.",
+          "provider": "Gemini",
+          "timestamp": "2026-03-25T08:58:39.719Z"
+        },
+        {
+          "id": 1774429146356,
+          "prompt": "telangana capital",
+          "response": "The capital of Telangana is **Hyderabad**.",
+          "provider": "Gemini",
+          "timestamp": "2026-03-25T08:59:06.356Z"
+        },
+        {
+          "id": 1774429163150,
+          "prompt": "andhra capital",
+          "response": "Andhra Pradesh, a state in southern India, has a complex and evolving situation with regards to its capital. \n\nHistorically, Hyderabad was the capital of Andhra Pradesh. However, in 2014, the state was bifurcated, and Telangana was formed, with Hyderabad as its capital. \n\nAfter the bifurcation, Andhra Pradesh was left without a capital, and the city of Hyderabad was to be the joint capital of both states for a period of 10 years.\n\nIn 2019, the Andhra Pradesh government, led by Chief Minister Y.S. Jagan Mohan Reddy, announced that the state would have three capitals: \n\n1. **Visakhapatnam** (also known as Vizag) as the executive capital, which would be the seat of the state secretariat and other government offices.\n2. **Amaravati** as the legislative capital, which would be the location of the state assembly and other legislative institutions.\n3. **Kurnool** as the judicial capital, which would be the seat of the high court.\n\nThis decision was made to decentralize development and distribute the benefits of being a capital city to different parts of the state. However, this decision has been controversial, with some people opposing the idea of having multiple capitals.\n\nSo, to summarize, Andhra Pradesh currently has three capitals: Visakhapatnam (executive), Amaravati (legislative), and Kurnool (judicial).",
+          "provider": "Groq",
+          "timestamp": "2026-03-25T08:59:23.150Z"
+        },
+        {
+          "id": 1774429312237,
+          "prompt": "kerala capital",
+          "response": "The capital of Kerala is Thiruvananthapuram.",
+          "provider": "Groq",
+          "timestamp": "2026-03-25T09:01:52.237Z"
+        },
+        {
+          "id": 1776874335966,
+          "prompt": "hlo",
+          "response": "Hello. How can I help you today?",
+          "provider": "Groq",
+          "timestamp": "2026-04-22T16:12:15.966Z"
+        },
+        {
+          "id": 1776874344923,
+          "prompt": "yeah",
+          "response": "It seems like you're not sure where to start or what to talk about. That's okay. I'm here to help and listen. Is there something on your mind that you'd like to chat about, or would you like some suggestions for conversation topics?",
+          "provider": "Groq",
+          "timestamp": "2026-04-22T16:12:24.923Z"
+        }
+      ],
+      "promptCount": 9
+    },
+    {
+      "id": "1773817521453",
+      "title": "Hello, tell me about yourself.",
+      "createdAt": "2026-03-18T07:05:21.453Z",
+      "updatedAt": "2026-03-18T07:06:36.967Z",
+      "conversations": [
+        {
+          "id": 1773817596967,
+          "prompt": "Hello, tell me about yourself.",
+          "response": "Okay, here's a bit about me:\n\n*   **I am a large language model, also known as a conversational AI or chatbot, trained to be informative and comprehensive.** I am trained on a massive amount of text data.\n\n*   **I am developed by Google.**\n\n*   **My purpose is to assist users with a wide range of tasks and questions.** This includes:\n    *   Answering questions in a comprehensive and informative way, even if they are open ended, challenging, or strange.\n    *   Generating different creative text formats of text, like poems, code, scripts, musical pieces, email, letters, etc. I will try my best to fulfill all your requirements.\n    *   Providing summaries of factual topics or creating stories.\n    *   Translating languages.\n    *   Offering recommendations.\n    *   Brainstorming ideas.\n\n*   **I learn and improve as I am exposed to more data.** While I can access and process information, I don't \"remember\" past conversations in the same way a human does. Each interaction is generally treated as a new one.\n\n*   **I don't have personal opinions, beliefs, or emotions.** My responses are based on the information I have been trained on. I strive to be objective and unbiased.\n\n*   **I am still under development.** There are limitations to my abilities, and I am always being refined and improved. I might sometimes make mistakes or provide inaccurate information, but I'm constantly learning and getting better.\n\nIs there anything specific you'd like to know about me or what I can do? Let me know how I can help you!\n",
+          "provider": "Gemini",
+          "timestamp": "2026-03-18T07:06:36.967Z"
+        }
+      ],
+      "promptCount": 1
+    },
+    {
+      "id": "1773817521407",
+      "title": "New Chat",
+      "createdAt": "2026-03-18T07:05:21.407Z",
+      "updatedAt": "2026-03-18T07:05:21.407Z",
+      "conversations": [],
+      "promptCount": 0
+    },
+    {
+      "id": "1773817521206",
+      "title": "New Chat",
+      "createdAt": "2026-03-18T07:05:21.206Z",
+      "updatedAt": "2026-03-18T07:05:21.206Z",
+      "conversations": [],
+      "promptCount": 0
+    },
+    {
+      "id": "1770995228276",
+      "title": "hello",
+      "createdAt": "2026-02-13T15:07:08.276Z",
+      "updatedAt": "2026-03-25T08:45:57.410Z",
+      "conversations": [
+        {
+          "id": 1770995240308,
+          "prompt": "hello",
+          "response": "Hello! How can I help you today?\n",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T15:07:20.308Z"
+        },
+        {
+          "id": 1770995247987,
+          "prompt": "who are you?",
+          "response": "I am a large language model, trained by Google.\n",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T15:07:27.987Z"
+        },
+        {
+          "id": 1770995255233,
+          "prompt": "when?",
+          "response": "To give you a helpful answer, I need more context. What are you asking about? For example, you could be asking:\n\n*   \"When is the meeting?\"\n*   \"When does the store open?\"\n*   \"When did World War II start?\"\n\nPlease provide more information so I can give you a specific answer.",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T15:07:35.233Z"
+        },
+        {
+          "id": 1770995278297,
+          "prompt": "what is this gemini do?",
+          "response": "To understand what Gemini does, let's break it down:\n\n**What is Gemini?**\n\nGemini is a family of large language models (LLMs) developed by Google. It's designed to be multimodal, meaning it can understand and process different types of information like text, code, audio, images, and video.\n\n**What can Gemini do?**\n\n*   **Generate different creative text formats,** like poems, code, scripts, musical pieces, email, letters, etc. I will try my best to fulfill all your requirements.\n*   **Answer your questions in an informative way,** even if they are open ended, challenging, or strange.\n*   **Follow your instructions and complete your requests thoughtfully.**\n*   **Translate languages.**\n*   **Summarize text.**\n*   **Write different kinds of content.**\n*   **Analyze and understand images and videos.**\n*   **Reason and problem-solve.**\n*   **Generate code in various programming languages.**\n*   **Act as a chatbot.**\n\n**Key Capabilities and Distinctions:**\n\n*   **Multimodality:**  This is a key differentiator. Unlike some LLMs that primarily focus on text, Gemini is built from the ground up to handle multiple data types. This allows it to perform more complex tasks and understand context more deeply.\n*   **Three Sizes:**  Google has released Gemini in three sizes:\n    *   **Gemini Ultra:** The most powerful model, intended for highly complex tasks.\n    *   **Gemini Pro:**  A more balanced model, designed for a wide range of applications. This is the version that powers the Gemini chatbot (previously Bard) and is available to developers through the Google AI Studio and Google Cloud Vertex AI.\n    *   **Gemini Nano:**  The smallest model, designed for on-device use (like on smartphones), enabling AI features to run locally without needing a constant internet connection.\n*   **Integration with Google Services:** Gemini is being integrated into various Google products and services, such as Search, Ads, Chrome, and Android.\n\n**In simpler terms:**\n\nImagine Gemini as a highly intelligent AI assistant that can understand and work with many different types of information.  You can ask it questions, give it instructions, and it can generate text, translate languages, analyze images, write code, and much more.  Its ability to handle different types of data simultaneously makes it very versatile.\n\n**To get the most accurate and up-to-date information, always refer to the official Google AI documentation and announcements regarding Gemini.**\n",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T15:07:58.297Z"
+        },
+        {
+          "id": 1770995302247,
+          "prompt": "tell me a joke",
+          "response": "Why don't scientists trust atoms?\n\nBecause they make up everything!\n",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T15:08:22.247Z"
+        },
+        {
+          "id": 1770995317501,
+          "prompt": "more jokes",
+          "response": "Here are some more jokes:\n\n1. Why don't scientists trust atoms? Because they make up everything.\n2. Why was the math book sad? Because it had too many problems.\n3. Did you hear about the restaurant on the moon? Great food, no atmosphere.\n4. Why don't eggs tell jokes? They'd crack each other up.\n5. Why did the scarecrow win an award? Because he was outstanding in his field.\n6. What do you call a fake noodle? An impasta.\n7. Why did the bicycle fall over? Because it was two-tired.\n8. I told my wife she was drawing her eyebrows too high. She looked surprised.\n9. Why did the baker go to the bank? He needed dough.\n10. Why did the mushroom go to the party? Because he was a fun-gi.\n11. Why did the cat join a band? Because he wanted to be the purr-cussionist.\n12. What do you call a group of cows playing instruments? A moo-sical band.\n13. Why did the banana go to the doctor? He wasn't peeling well.\n14. Why did the astronaut break up with his girlfriend? Because he needed space.\n15. What do you call a can opener that doesn't work? A can't opener.\n\nI hope you find these jokes amusing! Do you have a specific topic or theme you'd like to hear jokes about?",
+          "provider": "Groq",
+          "timestamp": "2026-02-13T15:08:37.501Z"
+        },
+        {
+          "id": 1774428357410,
+          "prompt": "hello",
+          "response": "Hello. How can I assist you today?",
+          "provider": "Groq",
+          "timestamp": "2026-03-25T08:45:57.410Z"
+        }
+      ],
+      "promptCount": 7
+    },
+    {
+      "id": "1770994640493",
+      "title": "What is AI?",
+      "createdAt": "2026-02-13T14:57:20.493Z",
+      "updatedAt": "2026-02-13T14:57:49.745Z",
+      "conversations": [
+        {
+          "id": 1770994669745,
+          "prompt": "What is AI?",
+          "response": "AI, or Artificial Intelligence, is a broad field of computer science focused on creating machines that can perform tasks that typically require human intelligence.  It's about getting computers to think, learn, and solve problems in ways that mimic human cognitive abilities.\n\nHere's a breakdown of what that entails:\n\n*   **Thinking Like Humans:** AI aims to develop systems that can reason, understand, and make decisions like humans. This includes things like problem-solving, planning, and dealing with uncertainty.\n\n*   **Learning from Data:** A core aspect of AI is the ability to learn from data without being explicitly programmed. This is often achieved through machine learning techniques.  The system analyzes data, identifies patterns, and improves its performance over time.\n\n*   **Acting Intelligently:**  AI systems are designed to take actions based on their understanding and learning. This could involve controlling robots, providing recommendations, engaging in conversations, or diagnosing diseases.\n\n**Key Concepts and Subfields:**\n\n*   **Machine Learning (ML):**  A type of AI that focuses on training algorithms to learn from data without explicit programming.  Examples include:\n    *   **Supervised Learning:**  Training a model with labeled data (e.g., images labeled as \"cat\" or \"dog\").\n    *   **Unsupervised Learning:** Finding patterns and structures in unlabeled data (e.g., clustering customers based on their purchasing behavior).\n    *   **Reinforcement Learning:**  Training an agent to make decisions in an environment to maximize a reward (e.g., training a robot to navigate a maze).\n\n*   **Deep Learning (DL):** A subfield of ML that uses artificial neural networks with many layers (\"deep\" networks) to analyze data. DL is particularly effective for tasks like image recognition, natural language processing, and speech recognition.\n\n*   **Natural Language Processing (NLP):**  Focuses on enabling computers to understand, interpret, and generate human language. This includes tasks like:\n    *   **Machine Translation:** Translating text between languages.\n    *   **Sentiment Analysis:** Determining the emotional tone of a piece of text.\n    *   **Chatbots:** Creating conversational agents.\n\n*   **Computer Vision:**  Enables computers to \"see\" and interpret images and videos.  This includes tasks like:\n    *   **Object Detection:** Identifying objects in an image.\n    *   **Image Recognition:**  Classifying images based on their content.\n    *   **Facial Recognition:** Identifying individuals from their facial features.\n\n*   **Robotics:**  Involves designing, constructing, operating, and applying robots.  AI plays a role in enabling robots to perform complex tasks, such as navigating environments, manipulating objects, and interacting with humans.\n\n**Different Types of AI (Based on Capability):**\n\n*   **Narrow or Weak AI:** Designed for a specific task.  Most AI systems today fall into this category.  Examples: spam filters, recommendation systems, voice assistants.\n\n*   **General or Strong AI:** Hypothetical AI that possesses human-level intelligence and can perform any intellectual task that a human being can. This does *not* currently exist.\n\n*   **Super AI:**  Hypothetical AI that surpasses human intelligence in all aspects.  This is purely theoretical and raises many ethical and philosophical questions.\n\n**In Summary:**\n\nAI is a rapidly evolving field with the goal of creating intelligent machines.  It encompasses a wide range of techniques and is already having a significant impact on many aspects of our lives, from healthcare and finance to transportation and entertainment. As the field advances, AI is poised to play an even larger role in shaping the future.\n",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T14:57:49.745Z"
+        }
+      ],
+      "promptCount": 1
+    },
+    {
+      "id": "1770994640475",
+      "title": "Tell me about space",
+      "createdAt": "2026-02-13T14:57:20.475Z",
+      "updatedAt": "2026-02-13T14:59:13.153Z",
+      "conversations": [
+        {
+          "id": 1770994753153,
+          "prompt": "Tell me about space",
+          "response": "Okay, let's dive into the vast and fascinating topic of space!  Here's a breakdown of key aspects to get you started:\n\n**What is Space?**\n\n*   **Definition:**  Most simply, space is the boundless, three-dimensional expanse in which objects and events have relative position and direction. It's everything beyond Earth's atmosphere. It's a near-vacuum, meaning it contains very little matter.\n*   **Not Empty:** Despite being called a vacuum, space isn't completely empty. It contains:\n    *   **Radiation:** Electromagnetic radiation like light, radio waves, X-rays, etc.\n    *   **Magnetic Fields:**  Generated by celestial bodies.\n    *   **Particles:**  Sparse amounts of gas (mostly hydrogen and helium), dust, and cosmic rays (high-energy particles).\n    *   **Dark Matter and Dark Energy:** Mysterious substances that make up the vast majority of the universe's mass and energy, but are not directly observable.\n\n**Key Components of Space:**\n\n*   **Stars:** Huge, luminous spheres of plasma held together by their own gravity. They generate energy through nuclear fusion in their cores. Our Sun is a star.\n*   **Planets:** Celestial bodies that orbit stars. They are generally smaller than stars and do not produce their own light. They reflect the light of their parent star.\n*   **Moons:** Natural satellites that orbit planets.\n*   **Asteroids:** Rocky or metallic objects that orbit the Sun, mostly found in the asteroid belt between Mars and Jupiter.\n*   **Comets:** Icy bodies that release gas and dust as they approach the Sun, creating a visible tail.\n*   **Nebulae:** Giant clouds of gas and dust in space. They can be the birthplaces of stars (stellar nurseries) or the remnants of dying stars.\n*   **Galaxies:**  Vast collections of stars, gas, dust, and dark matter, held together by gravity.  Our galaxy is called the Milky Way.\n*   **Black Holes:** Regions of spacetime with such strong gravity that nothing, not even light, can escape.\n*   **Quasars:** Extremely luminous active galactic nuclei, powered by supermassive black holes at the centers of distant galaxies.\n\n**Key Concepts & Phenomena:**\n\n*   **Gravity:** The fundamental force of attraction between objects with mass. Gravity shapes the orbits of planets, holds galaxies together, and influences the structure of the universe.\n*   **Light-Years:** The distance that light travels in one year (approximately 9.46 trillion kilometers or 5.88 trillion miles). Used to measure the vast distances between stars and galaxies.\n*   **Expansion of the Universe:** The universe is constantly expanding, meaning that galaxies are moving farther apart from each other. This expansion is driven by dark energy.\n*   **Cosmic Microwave Background (CMB):**  Faint afterglow of the Big Bang, the event that is believed to have started the universe.\n*   **Spacetime:**  A four-dimensional concept that combines the three dimensions of space with time. Gravity is understood as a curvature of spacetime caused by mass and energy.\n\n**Exploration of Space:**\n\n*   **Telescopes:** Instruments used to observe distant objects in space.  Ground-based telescopes are located on Earth, while space telescopes orbit above the atmosphere, providing clearer views.\n*   **Spacecraft:** Vehicles designed to travel in space.  These include:\n    *   **Satellites:** Orbit Earth or other planets, used for communication, navigation, observation, and scientific research.\n    *   **Space Probes:** Unmanned spacecraft sent to explore distant planets, moons, asteroids, and comets.\n    *   **Manned Spacecraft:**  Vehicles designed to carry humans into space.\n*   **Space Stations:**  Habitable artificial satellites where astronauts can live and work in space for extended periods. The International Space Station (ISS) is the most well-known.\n\n**Major Areas of Space Exploration and Research:**\n\n*   **Astrophysics:** The study of the physical properties and behavior of celestial objects and phenomena.\n*   **Cosmology:** The study of the origin, evolution, and structure of the universe.\n*   **Astrobiology:** The study of the possibility of life beyond Earth.\n*   **Planetary Science:** The study of planets, moons, asteroids, and comets in our solar system and beyond.\n*   **Exoplanet Research:**  The search for and study of planets orbiting stars other than our Sun.\n\n**Challenges of Space Travel:**\n\n*   **Distance:**  The vast distances between celestial objects make space travel time-consuming and expensive.\n*   **Harsh Environment:** Space is a hostile environment with extreme temperatures, radiation, and a lack of atmosphere.\n*   **Cost:**  Space exploration is a very expensive undertaking, requiring significant investment in technology and infrastructure.\n*   **Technological Limitations:**  We are still developing the technology needed to travel to distant stars and build sustainable settlements in space.\n\n**Why Explore Space?**\n\n*   **Scientific Discovery:**  Space exploration allows us to learn more about the universe, our place in it, and the origins of life.\n*   **Technological Advancement:**  Space exploration drives innovation and leads to the development of new technologies that can benefit society.\n*   **Resource Acquisition:**  Some believe that space exploration could eventually lead to the discovery and utilization of valuable resources.\n*   **Survival of Humanity:**  Some argue that space colonization is necessary for the long-term survival of humanity, in case of a catastrophic event on Earth.\n*   **Inspiration and Exploration:** The desire to explore the unknown is a fundamental part of the human spirit.\n\n**In summary, space is a vast and complex realm that continues to captivate and challenge us.  From the smallest particles to the largest galaxies, space holds countless mysteries waiting to be uncovered.**\n\nTo help me tailor my response, tell me:\n\n*   **What specifically are you most interested in about space?** (e.g., black holes, planets, space travel, cosmology, etc.)\n*   **What is your current level of knowledge?** (e.g., beginner, intermediate, advanced)\n\nI can then provide more specific and detailed information on the aspects you're most curious about.\n",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T14:59:13.153Z"
+        }
+      ],
+      "promptCount": 1
+    },
+    {
+      "id": "1770994629205",
+      "title": "Why is the sky blue?",
+      "createdAt": "2026-02-13T14:57:09.205Z",
+      "updatedAt": "2026-02-13T14:59:47.902Z",
+      "conversations": [
+        {
+          "id": 1770994787902,
+          "prompt": "Why is the sky blue?",
+          "response": "The sky is blue because of a phenomenon called **Rayleigh scattering**. Here's a breakdown:\n\n*   **Sunlight is made of all colors:** White sunlight is actually composed of all the colors of the rainbow.\n\n*   **Entering the atmosphere:** As sunlight enters the Earth's atmosphere, it collides with tiny air molecules (mostly nitrogen and oxygen).\n\n*   **Scattering of light:** This collision causes the sunlight to scatter in different directions.\n\n*   **Rayleigh scattering favors blue and violet:** Rayleigh scattering is more effective at scattering shorter wavelengths of light, which are blue and violet.\n\n*   **Why mostly blue, not violet?** While violet is scattered even more, the sun emits slightly less violet light, and our eyes are also less sensitive to violet. Therefore, we see mostly blue.\n\nSo, in simple terms, the air molecules scatter blue light from the sun more than other colors, and that's why the sky appears blue to our eyes.\n\n**Think of it like this:** Imagine throwing a bunch of tennis balls (sunlight) at a crowd of people (air molecules). Smaller people (blue light) are more likely to get knocked around in different directions, while bigger people (red light) are more likely to keep going straight.\n\n**Why is the sunset red/orange?**\n\nWhen the sun is setting or rising, the sunlight has to travel through much more of the atmosphere to reach our eyes. This means that most of the blue light has already been scattered away by the time it gets to us. The longer wavelengths like red and orange are scattered less, so they make it through, giving us those beautiful sunset colors.",
+          "provider": "Gemini",
+          "timestamp": "2026-02-13T14:59:47.902Z"
+        }
+      ],
+      "promptCount": 1
+    }
+  ],
+  "currentSessionId": "1774428779949"
+}
